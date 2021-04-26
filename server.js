@@ -3,7 +3,9 @@ const app = express();
 const cors = require("cors");
 const path = require("path");
 const mongoose = require("mongoose");
+const moment = require("moment");
 const db = require("./models");
+
 require('dotenv').config()
 const PORT = process.env.PORT || 5000;
 
@@ -36,22 +38,44 @@ mongoose.connect(process.env.URI,
 
 
 app.get('/',(req, res) =>{
-    res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/index.html');
 });
 
-app.get("/test", (req, res) => {
-    return db.Food.find({})
-    .then(result => res.json(result))
-    .catch(err => console.log(err))
+app.get("/diary", (req, res) => {
+  res.sendFile(__dirname + '/public/pages/post.html')
 })
 
-app.post("/post/food", (req, res) => {
-  db.Food.create({
-    foodName: req.body.foodName
-  })
-  .then(console.log(`Successfully added ${req.body.foodName}`))
+app.get("/diary/summary", (req, res) => {
+  res.sendFile(__dirname + '/public/pages/diary.html')
+})
+
+const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const d = moment().day();
+
+app.get("/food/:user", (req, res) => {
+  
+  return db.Food.find({ user: req.params.user })
+  .then(result => res.json(result))
   .catch(err => console.log(err))
 })
+
+app.post("/food/post", (req, res) => {
+  
+  db.Food.create({
+    user: req.body.user,
+    day: days[d],
+    meal: req.body.meal
+    })
+  .then(console.log(`Successfully added`))
+  .catch(err => console.log(err))
+})
+
+app.put("/food/:user/:day", (req, res) => {
+  db.Food.findOneAndUpdate({ user: req.params.user, day: req.params.day }, { $push: { meal: req.body.meal} })
+  .then(console.log(`Successfully added`))
+  .catch(err => console.log(err))
+})
+
 
 
 
