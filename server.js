@@ -52,11 +52,15 @@ app.get("/diary/summary", (req, res) => {
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const d = moment().day();
 
-app.get("/food/:user", (req, res) => {
+app.get("/food/:user/:day", (req, res) => {
   
-  return db.Food.find({ user: req.params.user })
+  return db.Food.find({ user: req.params.user, day: req.params.day })
   .then(result => res.json(result))
   .catch(err => console.log(err))
+})
+
+app.get("/day", (req,res) => {
+  return res.send(days[d]);
 })
 
 app.post("/food/post", (req, res) => {
@@ -70,7 +74,7 @@ app.post("/food/post", (req, res) => {
   .catch(err => console.log(err))
 })
 
-app.put("/food/:user/:day", (req, res) => {
+app.put("/add/:user/:day", (req, res) => {
   db.Food.findOneAndUpdate({ user: req.params.user, day: req.params.day }, { $push: { meal: req.body.meal} })
   .then(console.log(`Successfully added`))
   .catch(err => console.log(err))
