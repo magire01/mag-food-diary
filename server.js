@@ -36,33 +36,46 @@ mongoose.connect(process.env.URI,
     }
 });
 
-
+// home page route
 app.get('/',(req, res) =>{
   res.sendFile(__dirname + '/index.html');
 });
-
+//date page route
+app.get("/date", (req, res) => {
+  res.sendFile(__dirname + '/public/pages/date.html')
+})
+//post page route
 app.get("/diary", (req, res) => {
   res.sendFile(__dirname + '/public/pages/post.html')
 })
-
+//diary page route
 app.get("/diary/summary", (req, res) => {
   res.sendFile(__dirname + '/public/pages/diary.html')
 })
 
+//Today's date
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const d = moment().day();
-
-app.get("/food/:user/:day", (req, res) => {
-  
-  return db.Food.find({ user: req.params.user, day: req.params.day })
-  .then(result => res.json(result))
-  .catch(err => console.log(err))
-})
-
-app.get("/day", (req,res) => {
+//get day
+app.get("/day", (req, res) => {
   return res.send(days[d]);
 })
-
+app.get("/week", (req, res) => {
+  return res.send([days[d-1], days[d], days[d+1]]);
+})
+//get food for today
+app.get("/food/:user/:day", (req, res) => {
+  return db.Food.find({ user: req.params.user, day: req.params.day })
+  .then(result => {
+    if(!result) {
+      res.send(null)
+    } else {
+    res.json(result)
+    }
+  })
+  .catch(err => console.log(err))
+})
+//Post Day with first meal
 app.post("/food/post", (req, res) => {
   
   db.Food.create({
@@ -73,7 +86,7 @@ app.post("/food/post", (req, res) => {
   .then(console.log(`Successfully added`))
   .catch(err => console.log(err))
 })
-
+// add meal
 app.put("/add/:user/:day", (req, res) => {
   db.Food.findOneAndUpdate({ user: req.params.user, day: req.params.day }, { $push: { meal: req.body.meal} })
   .then(console.log(`Successfully added`))

@@ -6,6 +6,58 @@ $(document).ready(function(){
 
   let selectedMeal = "Breakfast";
 
+//Login Stuff - needs work
+  $("#login").append(`<form>
+        <p>Username</p>
+        <input />
+        <p>Password</p>
+        <input />
+        <button id="loginBtn">Login</button>
+        </form>`);
+
+    $("#loginBtn").on("click", function() {
+        console.log("click")
+    });
+
+//Select Day
+  $.ajax({
+    type: "GET",
+    url: `/week/`,
+    success: function(result) {
+      selectedDay = result;
+      $("#selectDay").append(`
+      <button id="yesterday">${result[0]}</button>
+      <button id="today">${result[1]}</button>
+      <button id="tomorrow">${result[2]}</button>`)
+      $("#today").on("click", function() {
+        selectedDay=result[1];
+        $.ajax({
+          type: "GET",
+          url: `/food/${user}/${selectedDay}`,
+          success: function(result) {
+            if (result == []) {
+              $("#isStarted").append(`<h3>Nothing Here</h3>
+              <a href="/diary"><button>Begin Day</button></a>`)
+            } else {
+              $("#isStarted").append(`<div class="row"> Day: ${result[0].day}</div>`);
+              for(var i = 0; i < result[0].meal.length; i++) {
+                $("#isStarted").append(`<div class="row"> ${result[0].meal[i].foodName}`)
+              }   
+              $("#isStarted").append(`<a href="/diary/summary"><button>Add Food</button></a>`)
+            }
+          },
+          error: function(err) {
+            console.log(err);
+          }
+        });
+      })
+    },
+    error: function(err) {
+      console.log(err);
+    }
+  });
+
+  
 //current meal buttons
 
   $("#currentMeal").append(
@@ -80,10 +132,15 @@ $(document).ready(function(){
         type: "GET",
         url: `/food/${user}/${selectedDay}`,
         success: function(result) {
-          $("#foodList").append(`<div class="row"> Day: ${result[0].day}</div>`);
-          for(var i = 0; i < result[0].meal.length; i++) {
+          if(result == []) {
+            $("#foodList").append(`<div class="row"> Nothing Here</div>`);
+          } else {
+            $("#foodList").append(`<div class="row"> Day: ${result[0].day}</div>`);
+            for(var i = 0; i < result[0].meal.length; i++) {
             $("#foodList").append(`<div class="row"> ${result[0].meal[i].foodName}`)
           }
+          }
+          
         },
         error: function(err) {
           console.log(err);
@@ -116,5 +173,7 @@ $(document).ready(function(){
         window.location.reload();
 
     });
+
+    console.log("day test: " + selectedDay)
     
 });
