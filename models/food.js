@@ -4,7 +4,9 @@ const moment = require("moment");
 
 const foodSchema = new Schema({
     user: { type: String, required: true },
-    day: { type: String, required: true},
+    day: { type: String, required: false},
+    date: { type: String, required: false},
+    stamp: { type: String, required: true},
     meal: [{
         mealName: { type: String, required: true },
         foodName: { type: String, required: true },

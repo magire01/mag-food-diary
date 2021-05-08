@@ -25,6 +25,7 @@ $(document).ready(function(){
     url: `/week/`,
     success: function(result) {
       selectedDay = result;
+      console.log("28 test" + selectedDay)
       $("#selectDay").append(`
       <button id="yesterday">${result[0]}</button>
       <button id="today">${result[1]}</button>
@@ -35,13 +36,13 @@ $(document).ready(function(){
           type: "GET",
           url: `/food/${user}/${selectedDay}`,
           success: function(result) {
-            if (result == []) {
+            if (result == null) {
               $("#isStarted").append(`<h3>Nothing Here</h3>
               <a href="/diary"><button>Begin Day</button></a>`)
             } else {
-              $("#isStarted").append(`<div class="row"> Day: ${result[0].day}</div>`);
-              for(var i = 0; i < result[0].meal.length; i++) {
-                $("#isStarted").append(`<div class="row"> ${result[0].meal[i].foodName}`)
+              // $("#isStarted").append(`<div class="row"> Day: ${result[0].day}</div>`);
+              for(var i = 0; i < result.meal.length; i++) {
+                $("#isStarted").append(`<div class="row"> ${result.meal[i].foodName}`)
               }   
               $("#isStarted").append(`<a href="/diary/summary"><button>Add Food</button></a>`)
             }
@@ -125,6 +126,7 @@ $(document).ready(function(){
     url: `/day/`,
     success: function(result) {
       selectedDay = result;
+      console.log("129" + selectedDay)
       $("#currentDay").append(`<h5>${result}</h5`)
 
       //get today's list of food
@@ -132,12 +134,14 @@ $(document).ready(function(){
         type: "GET",
         url: `/food/${user}/${selectedDay}`,
         success: function(result) {
-          if(result == []) {
+          console.log ("137" + selectedDay)
+          console.log("137" + result.day)
+          if(result = []) {
             $("#foodList").append(`<div class="row"> Nothing Here</div>`);
           } else {
-            $("#foodList").append(`<div class="row"> Day: ${result[0].day}</div>`);
-            for(var i = 0; i < result[0].meal.length; i++) {
-            $("#foodList").append(`<div class="row"> ${result[0].meal[i].foodName}`)
+            $("#foodList").append(`<div class="row"> Day: ${result.day}</div>`);
+            for(var i = 0; i < result.meal.length; i++) {
+            $("#foodList").append(`<div class="row"> ${result.meal[i].foodName}`)
           }
           }
           

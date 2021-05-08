@@ -5,6 +5,7 @@ const path = require("path");
 const mongoose = require("mongoose");
 const moment = require("moment");
 const db = require("./models");
+const { reset } = require("nodemon");
 
 require('dotenv').config()
 const PORT = process.env.PORT || 5000;
@@ -36,6 +37,8 @@ mongoose.connect(process.env.URI,
     }
 });
 
+
+
 // home page route
 app.get('/',(req, res) =>{
   res.sendFile(__dirname + '/index.html');
@@ -52,26 +55,48 @@ app.get("/diary", (req, res) => {
 app.get("/diary/summary", (req, res) => {
   res.sendFile(__dirname + '/public/pages/diary.html')
 })
+//user object for findOne query
+
+//summary page route
+app.get("/summary/", (req, res) => {
+    res.sendFile(__dirname + '/public/pages/summary.html')
+  
+})
 
 //Today's date
-const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const d = moment().day();
+const currentDay = moment().format("dddd");
+const currentDate = moment().format("l");
+const currentStamp = moment().format("DDMMYYYY");
+const currentWeek = {
+  dddd: [moment().subtract("3", "days").format("dddd"), moment().subtract("2", "days").format("dddd"), moment().subtract("1", "days").format("dddd"), moment().format("dddd"), moment().add("1", "days").format("dddd"), moment().add("2", "days").format("dddd"), moment().add("3", "days").format("dddd")],
+  l: [moment().subtract("3", "days").format("l"), moment().subtract("2", "days").format("l"), moment().subtract("1", "days").format("l"), moment().format("l"), moment().add("1", "days").format("l"), moment().add("2", "days").format("l"), moment().add("3", "days").format("l")],
+  stamp: [moment().subtract("3", "days").format("DDMMYYYY"), moment().subtract("2", "days").format("DDMMYYYY"), moment().subtract("1", "days").format("DDMMYYYY"), moment().format("DDMMYYYY"), moment().add("1", "days").format("DDMMYYYY"), moment().add("2", "days").format("DDMMYYYY"), moment().add("3", "days").format("DDMMYYYY")]
+}
 //get day
 app.get("/day", (req, res) => {
-  return res.send(days[d]);
+  return res.send({ day: currentDay, date: currentDate, stamp: currentStamp, week: currentWeek });
 })
-app.get("/week", (req, res) => {
-  return res.send([days[d-1], days[d], days[d+1]]);
-})
+// app.get("/week", (req, res) => {
+//   return res.send([days[d-1], days[d], days[d+1]]);
+// })
+// app.get("/food/all", (req, res) => {
+//   return db.Food.find()
+//   .then(result => console.log(result))
+// })
+
 //get food for today
-app.get("/food/:user/:day", (req, res) => {
-  return db.Food.find({ user: req.params.user, day: req.params.day })
+app.get("/summary/:user/:stamp", (req, res) => {
+  return db.Food.findOne({ user: req.params.user, stamp: req.params.stamp })
   .then(result => {
+
     if(!result) {
       res.send(null)
     } else {
-    res.json(result)
+      res.json(result)
     }
+    
+    
+    
   })
   .catch(err => console.log(err))
 })
