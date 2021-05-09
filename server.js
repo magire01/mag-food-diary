@@ -47,22 +47,15 @@ app.get('/',(req, res) =>{
 app.get("/date", (req, res) => {
   res.sendFile(__dirname + '/public/pages/date.html')
 })
-//post page route
-app.get("/diary", (req, res) => {
-  res.sendFile(__dirname + '/public/pages/post.html')
-})
-//diary page route
-app.get("/diary/summary", (req, res) => {
-  res.sendFile(__dirname + '/public/pages/diary.html')
-})
-//user object for findOne query
-
 //summary page route
 app.get("/summary/", (req, res) => {
     res.sendFile(__dirname + '/public/pages/summary.html')
   
 })
-
+//Start new day route
+app.get("/startDay/", (req, res) => {
+  res.sendFile(__dirname + '/public/pages/startDay.html')
+})
 //Today's date
 const currentDay = moment().format("dddd");
 const currentDate = moment().format("l");
@@ -76,13 +69,6 @@ const currentWeek = {
 app.get("/day", (req, res) => {
   return res.send({ day: currentDay, date: currentDate, stamp: currentStamp, week: currentWeek });
 })
-// app.get("/week", (req, res) => {
-//   return res.send([days[d-1], days[d], days[d+1]]);
-// })
-// app.get("/food/all", (req, res) => {
-//   return db.Food.find()
-//   .then(result => console.log(result))
-// })
 
 //get food for today
 app.get("/summary/:user/:stamp", (req, res) => {
@@ -93,30 +79,30 @@ app.get("/summary/:user/:stamp", (req, res) => {
       res.send(null)
     } else {
       res.json(result)
-    }
-    
-    
-    
+    } 
   })
   .catch(err => console.log(err))
 })
 //Post Day with first meal
-app.post("/food/post", (req, res) => {
+app.post("/create/item", (req, res) => {
   
   db.Food.create({
     user: req.body.user,
-    day: days[d],
+    day: req.body.day,
+    date: req.body.date,
+    stamp: req.body.stamp,
     meal: req.body.meal
     })
   .then(console.log(`Successfully added`))
   .catch(err => console.log(err))
 })
 // add meal
-app.put("/add/:user/:day", (req, res) => {
-  db.Food.findOneAndUpdate({ user: req.params.user, day: req.params.day }, { $push: { meal: req.body.meal} })
-  .then(console.log(`Successfully added`))
+app.put("/add/:user/:stamp", (req, res) => {
+  db.Food.findOneAndUpdate({ user: req.params.user, stamp: req.params.stamp }, { $push: { meal: req.body.meal } })
+  .then(console.log("successfully added item"))
   .catch(err => console.log(err))
 })
+
 
 
 

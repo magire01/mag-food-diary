@@ -37,6 +37,8 @@ $(document).ready(function(){
                         selectedDay.stamp = result.week.stamp[i];
                         //store user and stamp
                         sessionStorage.setItem("username", username);
+                        sessionStorage.setItem("day", selectedDay.dddd);
+                        sessionStorage.setItem("date", selectedDay.l)
                         sessionStorage.setItem("stamp", selectedDay.stamp);
 
                     // $(`#sumLink${i}`).attr("href", `/summary/${username}/${result.week.stamp[i]}`)
