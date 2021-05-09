@@ -5,7 +5,7 @@ const path = require("path");
 const mongoose = require("mongoose");
 const moment = require("moment");
 const db = require("./models");
-const { reset } = require("nodemon");
+const bcrypt = require('bcrypt');
 
 require('dotenv').config()
 const PORT = process.env.PORT || 5000;
@@ -56,6 +56,27 @@ app.get("/summary/", (req, res) => {
 app.get("/startDay/", (req, res) => {
   res.sendFile(__dirname + '/public/pages/startDay.html')
 })
+
+//sign up route
+app.get("/signUp", (req, res) => {
+  res.sendFile(__dirname + '/public/pages/signUp.html')
+})
+
+//Register User
+
+app.post("/create/profile", async(req, res) => {
+  try {
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    const user = { user: req.body.username, password: hashedPassword }
+    db.Profile.create(user)
+    .then(console.log("Successfully created User"))
+  } catch {
+    res.status(201).send()
+  }
+});
+
+
 //Today's date
 const currentDay = moment().format("dddd");
 const currentDate = moment().format("l");
@@ -85,7 +106,6 @@ app.get("/summary/:user/:stamp", (req, res) => {
 })
 //Post Day with first meal
 app.post("/create/item", (req, res) => {
-  
   db.Food.create({
     user: req.body.user,
     day: req.body.day,

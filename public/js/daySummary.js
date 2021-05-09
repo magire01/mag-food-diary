@@ -4,6 +4,7 @@ $(document).ready(function(){
 
 var username = sessionStorage.getItem("username")
 var stamp = sessionStorage.getItem("stamp")
+var selectedMeal = "Breakfast";
 
 console.log(username + " " + stamp)
 
@@ -28,6 +29,7 @@ $.ajax({
             //add item div
             $("#addItem").append(`
                 <button id="addItemBtn">Add Item</button>
+                <div id="currentMeal"> </div>
                 <div id="itemForm"> </div>
             `)
             //add item button
@@ -41,6 +43,42 @@ $.ajax({
                         <button type="button" id="addBtn">Submit</button>
                     </form>
                 `)
+                //current meal buttons
+
+    $("#currentMeal").append(
+        `<button id="breakfastBtn">Breakfast</button>
+        <button id="lunchBtn">Lunch</button>
+        <button id="dinnerBtn">Dinner</button>
+        <button id="snackBtn">Snack</button>`);
+
+    $("#breakfastBtn").on("click", function(e) {
+        e.preventDefault();
+        selectedMeal="Breakfast";
+        $('button').removeClass("activeBtn");
+        $(this).addClass("activeBtn");
+    })
+
+    $("#lunchBtn").on("click", function(e) {
+        e.preventDefault();
+        selectedMeal="Lunch";
+        $('button').removeClass("activeBtn");
+        $(this).addClass("activeBtn");
+    })
+
+    $("#dinnerBtn").on("click", function(e) {
+        e.preventDefault();
+        selectedMeal="Dinner";
+        $('button').removeClass("activeBtn");
+        $(this).addClass("activeBtn");
+    })
+
+    $("#snackBtn").on("click", function(e) {
+        e.preventDefault();
+        selectedMeal="Snack";
+        $('button').removeClass("activeBtn");
+        $(this).addClass("activeBtn");
+    })
+
 
                 //Post Call
                 $("#addBtn").on("click", function(){
@@ -50,7 +88,7 @@ $.ajax({
                         url: `/add/${username}/${stamp}/`,
                         data: { 
                             meal: { 
-                                mealName: "Breakfast",
+                                mealName: selectedMeal,
                                 foodName: $("#addFoodInput").val(),
                                 calories: $("#addCaloriesInput").val(),
                                 comments: "testpost"
@@ -62,7 +100,6 @@ $.ajax({
                         error: function(err) {
                         console.log(err);
                     }});
-                    console.log("add test: " + username + " " + stamp)
                     window.location.reload();
                 });
             })
@@ -72,6 +109,7 @@ $.ajax({
                 $("#showItems").append(`
                     <p>${result.meal[i].foodName}</p>
                     <p>${result.meal[i].calories} cal</p>
+                    <p>${result.meal[i].mealName}</p>
                 `)
             }
             
