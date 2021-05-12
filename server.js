@@ -7,6 +7,7 @@ const moment = require("moment");
 const db = require("./models");
 const bcrypt = require('bcrypt');
 
+
 require('dotenv').config()
 const PORT = process.env.PORT || 5000;
 
@@ -21,6 +22,7 @@ if (process.env.NODE_ENV === "production") {
 
 app.use(cors({ origin : [ "http://127.0.0.1:5000/"]}));
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 // Start the API server
 app.listen(PORT, function() {
@@ -61,6 +63,20 @@ app.get("/startDay/", (req, res) => {
 app.get("/signUp", (req, res) => {
   res.sendFile(__dirname + '/public/pages/signUp.html')
 })
+
+//login
+
+app.post("/login/", (req, res) => {
+  db.Profile.findOne({ user: req.body.user })
+  .then(async user => {
+    if (await bcrypt.compare(req.body.password, user.password)) {
+      res.send(true)
+    } else {
+      res.send(false)
+    }
+  })
+})
+
 
 //Register User
 
@@ -122,9 +138,3 @@ app.put("/add/:user/:stamp", (req, res) => {
   .then(console.log("successfully added item"))
   .catch(err => console.log(err))
 })
-
-
-
-
-
-
