@@ -1,7 +1,7 @@
 $(document).ready(function(){
     
     //selected day day
-    let username = "testUser"
+    let username = sessionStorage.getItem("username")
     let selectedDay = {
         dddd: "",
         l: "",
@@ -13,6 +13,9 @@ $(document).ready(function(){
         url: `/day/`,
         success: function(result) {
             console.log(result)
+            $("#welcome").append(`
+                <h3> Welcome ${username} </h3>
+            `)
             $("#todayDate").append(`
                 <button id="today">${result.day} ${result.date}</button>
                 
@@ -36,7 +39,7 @@ $(document).ready(function(){
                         selectedDay.l = result.week.l[i];
                         selectedDay.stamp = result.week.stamp[i];
                         //store user and stamp
-                        sessionStorage.setItem("username", username);
+                        //sessionStorage.setItem("username", username);
                         sessionStorage.setItem("day", selectedDay.dddd);
                         sessionStorage.setItem("date", selectedDay.l)
                         sessionStorage.setItem("stamp", selectedDay.stamp);

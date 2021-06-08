@@ -6,8 +6,11 @@ const mongoose = require("mongoose");
 const moment = require("moment");
 const db = require("./models");
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const checkAuth = require('./check-auth');
+const cookieParser = require('cookie-parser');
 
-
+app.use(cookieParser());
 require('dotenv').config()
 const PORT = process.env.PORT || 5000;
 
@@ -42,21 +45,35 @@ mongoose.connect(process.env.URI,
 
 
 // home page route
-app.get('/',(req, res) =>{
+app.get('/', checkAuth, (req, res) =>{
   res.sendFile(__dirname + '/index.html');
 });
 //date page route
 app.get("/date", (req, res) => {
-  res.sendFile(__dirname + '/public/pages/date.html')
+  const token = req.cookies.token
+  if (!token) {
+    res.send(401)
+  } else {
+    res.sendFile(__dirname + '/public/pages/date.html')
+  }
 })
 //summary page route
 app.get("/summary/", (req, res) => {
+  const token = req.cookies.token
+  if (!token) {
+    res.send(401)
+  } else {
     res.sendFile(__dirname + '/public/pages/summary.html')
-  
+  }
 })
 //Start new day route
 app.get("/startDay/", (req, res) => {
-  res.sendFile(__dirname + '/public/pages/startDay.html')
+  const token = req.cookies.token
+  if (!token) {
+    res.send(401)
+  } else {
+    res.sendFile(__dirname + '/public/pages/startDay.html')
+  }
 })
 
 //sign up route
@@ -70,12 +87,24 @@ app.post("/login/", (req, res) => {
   db.Profile.findOne({ user: req.body.user })
   .then(async user => {
     if (await bcrypt.compare(req.body.password, user.password)) {
-      res.send(true)
+      const jwtExpirySeconds = 300
+      const accessToken = jwt.sign({ user }, process.env.TOKEN_SECRET, {
+      algorithm: "HS256",
+      expiresIn: jwtExpirySeconds
+      })  
+      console.log(accessToken)
+      res.cookie("token", accessToken, { maxAge: jwtExpirySeconds * 1000 })
+      // var payload = jwt.verify(accessToken, process.env.TOKEN_SECRET)
+      // console.log(`Welcome ${JSON.stringify(payload.user.user)}!`)
+      res.end()
+
     } else {
-      res.send(false)
+      res.json({ message: "Invalid Credentials" });
+      console.log("Invalid Credentials")
     }
   })
 })
+
 
 
 //Register User
