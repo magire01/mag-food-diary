@@ -7,7 +7,6 @@ const moment = require("moment");
 const db = require("./models");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const checkAuth = require('./check-auth');
 const cookieParser = require('cookie-parser');
 
 app.use(cookieParser());
@@ -45,7 +44,7 @@ mongoose.connect(process.env.URI,
 
 
 // home page route
-app.get('/', checkAuth, (req, res) =>{
+app.get('/', (req, res) =>{
   res.sendFile(__dirname + '/index.html');
 });
 //date page route

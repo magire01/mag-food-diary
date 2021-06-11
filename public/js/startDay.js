@@ -7,10 +7,23 @@ $(document).ready(function(){
     //current meal buttons
 
     $("#currentMeal").append(
-        `<button id="breakfastBtn">Breakfast</button>
-        <button id="lunchBtn">Lunch</button>
-        <button id="dinnerBtn">Dinner</button>
-        <button id="snackBtn">Snack</button>`);
+        `
+        <div class="card addItemForm">
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="activeBtn" id="breakfastBtn">Breakfast</button>
+                <button type="button" id="lunchBtn">Lunch</button>
+                <button type="button" id="dinnerBtn">Dinner</button>
+                <button type="button" id="snackBtn">Snack</button>
+            </div>
+            <form>
+                <p>Food</p>
+                <input id="foodNameInput" />
+                <p>Calories</p>
+                <input id="caloriesInput" />
+                <a href="/summary/" class="btn" id="postDay">Submit</a>
+            </form>
+        </div>
+    `);
 
     $("#breakfastBtn").on("click", function(e) {
         e.preventDefault();
