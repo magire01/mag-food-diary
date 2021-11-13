@@ -6,6 +6,7 @@ const moment = require("moment");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const uuid = require('uuid');
 const AWS = require("aws-sdk");
 
 app.use(cookieParser());
@@ -139,6 +140,7 @@ app.post("/create/profile", async(req, res) => {
 //Post Day with first meal
 app.post("/create/item", async (req, res) => {
   const item = {
+    _id: req.body.user + req.body.stamp,
     user: req.body.user,
     day: req.body.day,
     date: req.body.date,
@@ -178,7 +180,7 @@ app.get("/summary/:user/:stamp", async (req, res) => {
   const params = {
     TableName: TABLE_INFO,
     Key: {
-      user: req.params.user
+      _id: req.params.user + req.params.stamp
     }
   }
 
@@ -191,7 +193,7 @@ app.get("/summary/:user/:stamp", async (req, res) => {
 app.put("/add/:user/:stamp", async (req, res) => {
   const params = {
     TableName: TABLE_INFO,
-    Key: { user: req.params.user },
+    Key: { _id: req.params.user + req.params.stamp },
     UpdateExpression: 'set #meal = list_append(#meal, :items)',
     ExpressionAttributeNames: {
       '#meal': 'meal'
