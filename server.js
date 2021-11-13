@@ -2,12 +2,11 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const path = require("path");
-const mongoose = require("mongoose");
 const moment = require("moment");
-const db = require("./models");
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const AWS = require("aws-sdk");
 
 app.use(cookieParser());
 require('dotenv').config()
@@ -31,16 +30,17 @@ app.listen(PORT, function() {
   console.log(`🌎  ==> API Server now listening on PORT ${PORT}!`);
 });
 
-mongoose.connect(process.env.URI,
-  { useNewUrlParser: true, useFindAndModify: false },
-  (err, res) => {
-    try {
-        console.log('Connected to Database');
-    } catch (err) {
-        throw err;
-    }
+//AWSCONFIG
+
+AWS.config.update({
+  region: process.env.AWS_DEFAULT_REGION,
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 });
 
+const dynamoClient = new AWS.DynamoDB.DocumentClient();
+const TABLE_USER = "food-diary-user";
+const TABLE_INFO = "food-diary-info";
 
 
 // home page route
@@ -83,18 +83,30 @@ app.get("/signUp", (req, res) => {
 //login
 
 app.post("/login/", (req, res) => {
-  db.Profile.findOne({ user: req.body.user })
+  const params = {
+    TableName: TABLE_USER,
+    Key: {
+      user: req.body.user
+    }
+  }
+  dynamoClient.get(params).promise()
   .then(async user => {
-    if (await bcrypt.compare(req.body.password, user.password)) {
-      const jwtExpirySeconds = 300
+    if (await bcrypt.compare(req.body.password, user.Item.password)) {
+      const jwtExpirySeconds = 1000
       const accessToken = jwt.sign({ user }, process.env.TOKEN_SECRET, {
       algorithm: "HS256",
       expiresIn: jwtExpirySeconds
       })  
       console.log(accessToken)
       res.cookie("token", accessToken, { maxAge: jwtExpirySeconds * 1000 })
-      // var payload = jwt.verify(accessToken, process.env.TOKEN_SECRET)
-      // console.log(`Welcome ${JSON.stringify(payload.user.user)}!`)
+      app.get("/summary/", (req, res) => {
+        const token = req.cookies.token
+        if (!token) {
+          res.send(401)
+        } else {
+          res.sendFile(__dirname + '/public/pages/summary.html')
+        }
+      })
       res.end()
 
     } else {
@@ -106,19 +118,44 @@ app.post("/login/", (req, res) => {
 
 
 
-//Register User
+// //Register User
 
 app.post("/create/profile", async(req, res) => {
   try {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
     const user = { user: req.body.username, password: hashedPassword }
-    db.Profile.create(user)
-    .then(console.log("Successfully created User"))
+    const params = {
+      TableName: TABLE_USER,
+      Item: user
+    }
+    await dynamoClient.put(params).promise()
+    .then(console.log("Success!"))
   } catch {
     res.status(201).send()
   }
 });
+
+//Post Day with first meal
+app.post("/create/item", async (req, res) => {
+  const item = {
+    user: req.body.user,
+    day: req.body.day,
+    date: req.body.date,
+    stamp: req.body.stamp,
+    meal: [
+      req.body.meal
+    ]
+
+  }
+  const params = {
+    TableName: TABLE_INFO,
+    Item: item
+  }
+  await dynamoClient.put(params).promise()
+  .then(console.log(params))
+  .catch(err => console.log(err))
+})
 
 
 //Today's date
@@ -136,33 +173,33 @@ app.get("/day", (req, res) => {
 })
 
 //get food for today
-app.get("/summary/:user/:stamp", (req, res) => {
-  return db.Food.findOne({ user: req.params.user, stamp: req.params.stamp })
-  .then(result => {
+app.get("/summary/:user/:stamp", async (req, res) => {
 
-    if(!result) {
-      res.send(null)
-    } else {
-      res.json(result)
-    } 
-  })
+  const params = {
+    TableName: TABLE_INFO,
+    Key: {
+      user: req.params.user
+    }
+  }
+
+  await dynamoClient.get(params).promise()
+  .then(result => res.send(result.Item))
   .catch(err => console.log(err))
 })
-//Post Day with first meal
-app.post("/create/item", (req, res) => {
-  db.Food.create({
-    user: req.body.user,
-    day: req.body.day,
-    date: req.body.date,
-    stamp: req.body.stamp,
-    meal: req.body.meal
-    })
-  .then(console.log(`Successfully added`))
-  .catch(err => console.log(err))
-})
+
 // add meal
-app.put("/add/:user/:stamp", (req, res) => {
-  db.Food.findOneAndUpdate({ user: req.params.user, stamp: req.params.stamp }, { $push: { meal: req.body.meal } })
-  .then(console.log("successfully added item"))
+app.put("/add/:user/:stamp", async (req, res) => {
+  const params = {
+    TableName: TABLE_INFO,
+    Key: { user: req.params.user },
+    UpdateExpression: 'set #meal = list_append(#meal, :items)',
+    ExpressionAttributeNames: {
+      '#meal': 'meal'
+    },
+    ExpressionAttributeValues: {
+      ':items': req.body.meal
+      }
+  }
+  await dynamoClient.update(params).promise()
   .catch(err => console.log(err))
 })

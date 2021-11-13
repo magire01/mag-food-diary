@@ -15,6 +15,7 @@ $(document).ready(function(){
             success: function(result) {
                 console.log(result)
                 sessionStorage.setItem("username", userLogin)
+                window.location.replace("/summary/")
             },
             error: function(err) {
                 console.log(err)

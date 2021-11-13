@@ -62,12 +62,12 @@ $(document).ready(function(){
                 day: day,
                 date: date,
                 stamp: stamp,
-                meal: {
+                meal: [{
                     mealName: selectedMeal,
                     foodName: $("#foodNameInput").val(),
                     calories: $("#caloriesInput").val(),
                     comments: "test"
-                }
+                }]
             }
         })
     })

@@ -115,13 +115,16 @@ $.ajax({
                     $.ajax({
                         type: "PUT",
                         url: `/add/${username}/${stamp}/`,
-                        data: { 
-                            meal: { 
+                        data:{
+                            meal: [
+                            { 
                                 mealName: selectedMeal,
                                 foodName: $("#addFoodInput").val(),
                                 calories: $("#addCaloriesInput").val(),
                                 comments: "testpost"
+                            
                             }
+                        ]
                         },
                         success: function(result) {
                         console.log("Successfully added");
