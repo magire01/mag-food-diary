@@ -103,8 +103,9 @@ app.post("/login/", (req, res) => {
       algorithm: "HS256",
       expiresIn: jwtExpirySeconds
       })  
-      console.log(accessToken)
+      res.send(accessToken)
       res.cookie("token", accessToken, { maxAge: jwtExpirySeconds * 1000 })
+      
       app.get("/summary/", (req, res) => {
         const token = req.cookies.token
         if (!token) {
