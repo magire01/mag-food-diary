@@ -22,7 +22,12 @@ if (process.env.NODE_ENV === "production") {
 }
 // Add routes, both API and view
 
-app.use(cors({ origin : [ "http://127.0.0.1:5000/"]}));
+const corsOptions ={
+  origin:true, 
+  credentials:true,   
+  optionSuccessStatus:200
+}
+app.use(cors(corsOptions));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
