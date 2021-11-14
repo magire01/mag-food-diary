@@ -24,6 +24,7 @@ if (process.env.NODE_ENV === "production") {
 
 const corsOptions ={
   origin: true,
+  methods: "OPTIONS, GET, POST, PUT",
   credentials: true,   
   optionSuccessStatus:200
 }
