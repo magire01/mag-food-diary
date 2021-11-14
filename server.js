@@ -24,9 +24,7 @@ if (process.env.NODE_ENV === "production") {
 
 const corsOptions ={
   origin: "*",
-  methods: "OPTIONS, GET, POST, PUT",
-  credentials: true,   
-  optionSuccessStatus:200
+  methods: "OPTIONS, GET, POST, PUT"
 }
 app.use(cors(corsOptions))
 app.use(express.static(path.join(__dirname, 'public')));
@@ -197,7 +195,7 @@ app.get("/summary/:user/:stamp", async (req, res) => {
 })
 
 // add meal
-app.put("/add/:user/:stamp", async (req, res) => {
+app.patch("/add/:user/:stamp", async (req, res) => {
   const params = {
     TableName: TABLE_INFO,
     Key: { _id: req.params.user + req.params.stamp },
