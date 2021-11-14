@@ -23,11 +23,10 @@ if (process.env.NODE_ENV === "production") {
 // Add routes, both API and view
 
 const corsOptions ={
-  origin: "*",
+  origin: [ "http://127.0.0.1:3000/"],
   methods: 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
   credentials: true,   
-  optionSuccessStatus:200,
-  headers: "content-type"
+  optionSuccessStatus:200
 }
 app.use(cors(corsOptions))
 app.use(express.static(path.join(__dirname, 'public')));
