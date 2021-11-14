@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === "production") {
 const corsOptions ={
   origin: "*", 
   methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH'],
-  credentials:true,   
+  credentials: false,   
   optionSuccessStatus:200
 }
 app.use(cors(corsOptions))
