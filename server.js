@@ -23,9 +23,9 @@ if (process.env.NODE_ENV === "production") {
 // Add routes, both API and view
 
 const corsOptions ={
-  origin: "*", 
-  methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH'],
-  credentials: false,   
+  origin: "*",
+  methods: 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+  credentials: true,   
   optionSuccessStatus:200
 }
 app.use(cors(corsOptions))
@@ -105,7 +105,7 @@ app.post("/login/", (req, res) => {
       expiresIn: jwtExpirySeconds
       })  
       res.send(accessToken)
-      res.cookie("token", accessToken, { maxAge: jwtExpirySeconds * 1000 })
+      //res.cookie("token", accessToken, { maxAge: jwtExpirySeconds * 1000 })
       
       app.get("/summary/", (req, res) => {
         const token = req.cookies.token
