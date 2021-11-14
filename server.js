@@ -23,16 +23,12 @@ if (process.env.NODE_ENV === "production") {
 // Add routes, both API and view
 
 const corsOptions ={
-  origin: true, 
+  origin: "*", 
+  methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH'],
   credentials:true,   
   optionSuccessStatus:200
 }
-app.use((req, res) => {
-  cors(corsOptions)
-  res.header("Access-Control-Allow-Headers","*");
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-})
+app.use(cors(corsOptions))
 app.use(express.static(path.join(__dirname, 'public')));
 
 
