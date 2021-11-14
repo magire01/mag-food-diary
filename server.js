@@ -26,7 +26,8 @@ const corsOptions ={
   origin: "*",
   methods: 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
   credentials: true,   
-  optionSuccessStatus:200
+  optionSuccessStatus:200,
+  headers: "content-type"
 }
 app.use(cors(corsOptions))
 app.use(express.static(path.join(__dirname, 'public')));
