@@ -23,7 +23,7 @@ if (process.env.NODE_ENV === "production") {
 // Add routes, both API and view
 
 const corsOptions ={
-  origin: true,
+  origin: "*",
   methods: "OPTIONS, GET, POST, PUT",
   credentials: true,   
   optionSuccessStatus:200
