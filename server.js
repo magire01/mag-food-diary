@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === "production") {
 
 const corsOptions ={
   origin: "*",
-  methods: "OPTIONS, GET, POST, PUT"
+  methods: "OPTIONS, GET, POST, PUT, PATCH"
 }
 app.use(cors(corsOptions))
 app.use(express.static(path.join(__dirname, 'public')));
